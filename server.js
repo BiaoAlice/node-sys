@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const user = require('./router/user');
 const jdList = require('./router/jdList');
 const bodyParser = require('body-parser');
+const cityList = require('./router/cityList')
 const app = express();
 
 //链接mongodb
@@ -21,6 +22,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/user',user);
 app.use('/jdList',jdList);
+app.use('/cityList',cityList);
 
 
 app.listen('3000');
