@@ -3,6 +3,8 @@ const router = express.Router();
 const User = require('../model/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const token = require('../token');
+
 
 router.get('/add',(req,res)=>{
     let studentId = req.query.studentId;
@@ -42,7 +44,7 @@ router.post('/login',(req,res)=>{
                             const token = jwt.sign({
                                 studentId:use.studentId,
                                 studentPsd:use.studentPsd
-                                },'my_token',{expiresIn:'60s'})
+                                },'my_token',{expiresIn:'1d'})
                               res.json({"code":"1","msg":"登陆成功","token":token,"name":use.studentName});
                           }
                       })
@@ -50,15 +52,18 @@ router.post('/login',(req,res)=>{
       })
 })
 
+
 //token 验证
-router.get('/token',(req,res)=>{
-    let token = req.query.token;
-    jwt.verify(token, 'my_token', (error, decoded) => {
-        if (error) {
-            res.json({"code":"0","msg":"登录已过期"});
-            return;
-        }
-        console.log(decoded) //在这里验证token时效的时候，将当前的时间/1000向下取整
+router.get('/getmsg',(req,res)=>{
+    let status = token(req.query.token);
+    if(status == 0){
+        res.json({"code":"0","msg":"登录过时！"});
+        return;
+    }
+    User.findOne({studentId:status.studentId})
+        .then(use=>{
+            console.log(use);
+            res.json({"code":"1","msg":{"studentId":use.studentId,"studentName":use.studentName}});
         })
 })
 
