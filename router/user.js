@@ -63,8 +63,28 @@ router.get('/getmsg',(req,res)=>{
     User.findOne({studentId:status.studentId})
         .then(use=>{
             console.log(use);
-            res.json({"code":"1","msg":{"studentId":use.studentId,"studentName":use.studentName}});
+            res.json({"code":"1","msg":{"studentId":use.studentId,"studentName":use.studentName,"studentPayPsd":use.studentPayPsd,"balance":use.balance}});
         })
+})
+
+router.get('/updata',(req,res)=>{
+    let status = token(req.query.token);
+    let price = parseInt(req.query.price);
+    if(status == 0){
+        res.json({"code":"0","msg":"登录过时！"});
+        return;
+    }
+    User.findOne({studentId:status.studentId})
+    .then(use=>{
+        let balance = parseInt(use.balance) + price;
+        User.update({studentId:status.studentId},{$set: {balance}})
+            .then(()=>{
+                User.findOne({studentId:status.studentId})
+                    .then(use=>{
+                        res.json({"code":"1","msg":{"studentId":use.studentId,"studentName":use.studentName,"studentPayPsd":use.studentPayPsd,"balance":use.balance}});
+                    })
+            })
+    })
 })
 
 router.get('/get',(req,res)=>{

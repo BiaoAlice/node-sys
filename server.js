@@ -15,11 +15,9 @@ mongoose.connect("mongodb://localhost:27017/node-sys")
             console.log(err);
         })
 
-// app.get('/',(req,res)=>{
-//     let msg =  token();
-//     console.log(msg);
-//     res.json({msg});
-// })
+app.get('/',(req,res)=>{
+    res.json({"msg":"123"});
+})
 
 //使用中间件
 app.use(bodyParser.json());

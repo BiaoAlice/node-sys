@@ -14,6 +14,14 @@ let userSchema = new Schema({
         type:String,
         required:true
     },
+    studentPayPsd:{
+        type:String,
+        required:true
+    },
+    balance:{
+        type:String,
+        default:"0"
+    }
 })
 
 module.exports = user = mongoose.model('user',userSchema);
