@@ -45,7 +45,7 @@ router.post('/login',(req,res)=>{
                                 studentId:use.studentId,
                                 studentPsd:use.studentPsd
                                 },'my_token',{expiresIn:'1d'})
-                              res.json({"code":"1","msg":"登陆成功","token":token,"name":use.studentName});
+                              res.json({"code":"1","msg":"登陆成功","token":token,"name":use.studentName,"studentId":use.studentId,"studentPayPsd":use.studentPayPsd,"balance":use.balance});
                           }
                       })
             }
@@ -53,7 +53,6 @@ router.post('/login',(req,res)=>{
 })
 
 
-//token 验证
 router.get('/getmsg',(req,res)=>{
     let status = token(req.query.token);
     if(status == 0){
@@ -62,8 +61,7 @@ router.get('/getmsg',(req,res)=>{
     }
     User.findOne({studentId:status.studentId})
         .then(use=>{
-            console.log(use);
-            res.json({"code":"1","msg":{"studentId":use.studentId,"studentName":use.studentName,"studentPayPsd":use.studentPayPsd,"balance":use.balance}});
+            res.json({"code":"1","msg":{"studentId":use.studentId,"studentName":use.studentName,"studentPsd":use.studentPsd,"studentPayPsd":use.studentPayPsd,"balance":use.balance}});
         })
 })
 
@@ -81,12 +79,79 @@ router.get('/updata',(req,res)=>{
             .then(()=>{
                 User.findOne({studentId:status.studentId})
                     .then(use=>{
+                        res.json({"code":"1","msg":{"studentId":use.studentId,"studentName":use.studentName,"studentPsd":use.studentPsd,"studentPayPsd":use.studentPayPsd,"balance":use.balance}});
+                    })
+            })
+    })
+})
+
+router.get('/money',(req,res)=>{
+    let status = token(req.query.token);
+    let price = req.query.price;
+    if(status == 0){
+        res.json({"code":"0","msg":"登录过时！"});
+        return;
+    }
+    User.findOne({studentId:status.studentId})
+    .then(use=>{
+        User.update({studentId:status.studentId},{$set: {balance:price}})
+            .then(()=>{
+                User.findOne({studentId:status.studentId})
+                    .then(use=>{
+                        console.log(use);
                         res.json({"code":"1","msg":{"studentId":use.studentId,"studentName":use.studentName,"studentPayPsd":use.studentPayPsd,"balance":use.balance}});
                     })
             })
     })
 })
 
+router.post('/updatepsd',(req,res)=>{
+    let status = token(req.body.token),
+        psd = req.body.studentPsd,
+        payPsd = req.body.payPsd;
+    if(status == 0){
+        res.json({"code":"0","msg":"登录过时！"});
+        return;
+    }
+    if(psd == ''){
+        User.findOne({studentId:status.studentId})
+        .then(use=>{
+                User.update({studentId:status.studentId},{$set: {studentPayPsd:payPsd}})
+                .then(()=>{
+                    res.json({"code":"1","msg":"修改成功！"})
+                })
+            })
+            return ;
+    }
+    if(payPsd == ''){
+        User.findOne({studentId:status.studentId})
+        .then(use=>{
+            bcrypt.genSalt(10, function(err, salt) { //10是等级的意思
+                bcrypt.hash(psd, salt, function(err, hash) {
+                if(err) throw err;
+                User.update({studentId:status.studentId},{$set: {studentPsd:hash}})
+                .then(()=>{
+                    res.json({"code":"1","msg":"修改成功！"})
+                })
+            })
+        })
+    })
+    return ;
+}
+    User.findOne({studentId:status.studentId})
+        .then(use=>{
+            bcrypt.genSalt(10, function(err, salt) { //10是等级的意思
+                bcrypt.hash(psd, salt, function(err, hash) { //第一个参数是加密的内容
+                // Store hash in your password DB.
+                if(err) throw err;
+                User.update({studentId:status.studentId},{$set: {studentPsd:hash,studentPayPsd:payPsd}})
+                .then(()=>{
+                    res.json({"code":"1","msg":"修改成功！"})
+                })
+            })
+        })
+    })
+})
 router.get('/get',(req,res)=>{
     User.find({})
         .then(result=>{

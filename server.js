@@ -4,6 +4,7 @@ const user = require('./router/user');
 const jdList = require('./router/jdList');
 const bodyParser = require('body-parser');
 const cityList = require('./router/cityList');
+const order = require('./router/order');
 const app = express();
 
 //链接mongodb
@@ -25,6 +26,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/user',user);
 app.use('/jdList',jdList);
 app.use('/cityList',cityList);
+app.use('/order',order);
 
 
 app.listen('3000');
