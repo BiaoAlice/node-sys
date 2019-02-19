@@ -6,26 +6,34 @@ const jwt = require('jsonwebtoken');
 const token = require('../token');
 
 
-router.get('/add',(req,res)=>{
-    let studentId = req.query.studentId;
-    let studentName = req.query.studentName;
-    let studentPsd = req.query.studentPsd;
+router.post('/add',(req,res)=>{
+    let {studentId,studentName,studentPsd} = req.body;
     bcrypt.genSalt(10, function(err, salt) { //10是等级的意思
             bcrypt.hash(studentPsd, salt, function(err, hash) { //第一个参数是加密的内容
             // Store hash in your password DB.
             if(err) throw err;
-            let newUser = new User({
-                studentId,
-                studentName,
-                studentPsd:hash
-            })
-            User(newUser).save()
-                         .then(()=>{
-                             res.json({"code":"1","msg":"添加成功"});
-                         })
-                         .catch(err=>{
-                             console.log(err);
-                         })
+            User.findOne({studentId})
+                .then(user=>{
+                    if(user){
+                        res.json({"code":"0","msg":"学号已经存在，请重新添加"})
+                    }else{
+                        let newUser = new User({
+                            studentId,
+                            studentName,
+                            studentPsd:hash,
+                            balance:'0',
+                            studentPayPsd:'123456'
+                        })
+                        User(newUser).save()
+                                     .then(()=>{
+                                         res.json({"code":"1","msg":"添加成功"});
+                                     })
+                                     .catch(err=>{
+                                        console.log(err);
+                                     })
+                    }
+                })
+            
             });
         });
 })
@@ -64,7 +72,22 @@ router.get('/getmsg',(req,res)=>{
             res.json({"code":"1","msg":{"studentId":use.studentId,"studentName":use.studentName,"studentPsd":use.studentPsd,"studentPayPsd":use.studentPayPsd,"balance":use.balance}});
         })
 })
-
+router.post('/remove',(req,res)=>{
+    let {list} = req.body;
+    let p;
+    list.forEach(item=>{
+        console.log(item)
+        User.remove(item)
+            .then(()=>{
+                console.log('success');
+            })
+            .catch(err=>{
+                console.log(err);
+            })
+    })
+    res.json({"code":"1","msg":"删除成功"});
+    
+})
 router.get('/updata',(req,res)=>{
     let status = token(req.query.token);
     let price = parseInt(req.query.price);
@@ -155,7 +178,7 @@ router.post('/updatepsd',(req,res)=>{
 router.get('/get',(req,res)=>{
     User.find({})
         .then(result=>{
-            console.log(result);
+            res.json({"code":"1","data":result})
         })
 })
 module.exports = router;
