@@ -76,7 +76,6 @@ router.post('/remove',(req,res)=>{
     let {list} = req.body;
     let p;
     list.forEach(item=>{
-        console.log(item)
         User.remove(item)
             .then(()=>{
                 console.log('success');
