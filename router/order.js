@@ -44,8 +44,17 @@ router.get('/get',(req,res)=>{
             res.json({"code":"1","data":order})
         })
 })
+
 router.get('/getorder',(req,res)=>{
     Order.find({})
+        .then(order=>{
+            res.json({"code":"1","data":order})
+        })
+})
+
+router.get('/sreachorder',(req,res)=>{
+    let name = req.query.name;
+    Order.find({name})
         .then(order=>{
             res.json({"code":"1","data":order})
         })

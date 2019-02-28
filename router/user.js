@@ -6,6 +6,39 @@ const jwt = require('jsonwebtoken');
 const token = require('../token');
 
 
+router.post('/addexcel',(req,res)=>{
+    let {data} = req.body,
+        studentPsd ='123456';
+    data.forEach(item=>{
+        User.findOne({studentId:item.studentId})
+            .then(user=>{
+                if(!user){
+                    console.log(item.studentId);
+                    bcrypt.genSalt(10, function(err, salt) {
+                        bcrypt.hash(studentPsd, salt, function(err, hash) {
+                            let newUser = new User({
+                                studentId:item.studentId,
+                                studentName:item.studentName,
+                                studentPsd:hash,
+                                balance:'0',
+                                studentPayPsd:'123456'
+                            });
+                            User(newUser).save()
+                                .then(()=>{
+                                    res.json({"code":"1","msg":"添加成功"});
+                                })
+                                .catch(err=>{
+                                    console.log(err);
+                                    res.json({"code":"0","msg":"添加失败"});
+                                })
+                        })
+                    })
+                }
+            })
+    })
+    
+})
+
 router.post('/add',(req,res)=>{
     let {studentId,studentName,studentPsd} = req.body;
     bcrypt.genSalt(10, function(err, salt) { //10是等级的意思
