@@ -4,6 +4,8 @@ const User = require('../model/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const token = require('../token');
+const Order = require('../model/Order');
+
 
 
 router.post('/addexcel',(req,res)=>{
@@ -107,11 +109,21 @@ router.get('/getmsg',(req,res)=>{
 })
 router.post('/remove',(req,res)=>{
     let {list} = req.body;
+    console.log(list);
     let p;
     list.forEach(item=>{
         User.remove(item)
             .then(()=>{
-                console.log('success');
+                let id = item.studentId;
+                Order.find({studentId:id})
+                     .then(order=>{
+                         order.forEach(ele =>{
+                            Order.remove(ele)
+                            .then(()=>{
+                                  console.log('删除成功！');
+                            })
+                         })
+                     })
             })
             .catch(err=>{
                 console.log(err);

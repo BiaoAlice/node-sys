@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Order = require('../model/Order')
-const token = require('../token')
+const Order = require('../model/Order');
+const token = require('../token');
 
 router.get('/add',(req,res)=>{
     let {studentId,orderId,code , price ,start,end,startTime,endTime,time,name,tell,type} =req.query;
