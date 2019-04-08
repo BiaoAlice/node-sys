@@ -15,7 +15,6 @@ router.post('/addexcel',(req,res)=>{
         User.findOne({studentId:item.studentId})
             .then(user=>{
                 if(!user){
-                    console.log(item.studentId);
                     bcrypt.genSalt(10, function(err, salt) {
                         bcrypt.hash(studentPsd, salt, function(err, hash) {
                             let newUser = new User({
@@ -30,7 +29,6 @@ router.post('/addexcel',(req,res)=>{
                                     res.json({"code":"1","msg":"添加成功"});
                                 })
                                 .catch(err=>{
-                                    console.log(err);
                                     res.json({"code":"0","msg":"添加失败"});
                                 })
                         })
@@ -109,7 +107,6 @@ router.get('/getmsg',(req,res)=>{
 })
 router.post('/remove',(req,res)=>{
     let {list} = req.body;
-    console.log(list);
     let p;
     list.forEach(item=>{
         User.remove(item)
@@ -165,7 +162,6 @@ router.get('/money',(req,res)=>{
             .then(()=>{
                 User.findOne({studentId:status.studentId})
                     .then(use=>{
-                        console.log(use);
                         res.json({"code":"1","msg":{"studentId":use.studentId,"studentName":use.studentName,"studentPayPsd":use.studentPayPsd,"balance":use.balance}});
                     })
             })

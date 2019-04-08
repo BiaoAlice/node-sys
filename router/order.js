@@ -27,7 +27,6 @@ router.get('/add',(req,res)=>{
                 res.json({"code":"1","msg":"订单下单成功！"})
          })
          .catch(err=>{
-             console.log(err);
             res.json({"code":"0","msg":"订单下单失败"})
 
          })
