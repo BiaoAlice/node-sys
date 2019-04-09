@@ -7,5 +7,4 @@ function checkToken (a){
             return decoded;
         })
 }
-
 module.exports = checkToken;
